@@ -55,7 +55,27 @@
     } else {
       S.lastActive = todayStr(); save();
     }
-    if (url) window.open(url, "_blank", "noopener");
+    if (url) openModule(url, trackName(trackKey));
+  }
+  // 统一外壳：模块在 Hub 内以内嵌 iframe 打开，不跳独立站
+  function closeModule() { var m = document.getElementById("modview"); if (m) m.remove(); }
+  function openModule(url, name) {
+    if (!url) return;
+    closeModule();
+    // 把 embed=1 放到 query（# 之前），保留 hash（模块内路由用）
+    var hash = "", base = url, hi = url.indexOf("#");
+    if (hi > -1) { hash = url.slice(hi); base = url.slice(0, hi); }
+    var sep = base.indexOf("?") > -1 ? "&" : "?";
+    var src = base + sep + "embed=1" + hash;
+    var el = document.createElement("div");
+    el.id = "modview"; el.className = "modview";
+    el.innerHTML = '<div class="modbar">' +
+      '<button class="modback" aria-label="返回">‹ 返回</button>' +
+      '<span class="modname">' + esc(name || "模块") + '</span>' +
+      '<a class="modopen" href="' + esc(url) + '" target="_blank" rel="noopener" title="新窗口打开">↗</a></div>' +
+      '<iframe class="modframe" src="' + esc(src) + '" title="' + esc(name || "模块") + '" loading="eager"></iframe>';
+    document.body.appendChild(el);
+    el.querySelector(".modback").addEventListener("click", closeModule);
   }
   function openChest() {
     if (!goalMet() || S.chestOpenedOn === todayStr()) return;
@@ -162,8 +182,9 @@
   function bindModules() {
     view.querySelectorAll("[data-mod]").forEach(function (n) {
       n.addEventListener("click", function () {
-        if (n.dataset.live === "1" && n.dataset.url) window.open(n.dataset.url, "_blank", "noopener");
-        else toast("「" + n.querySelector(".mn").textContent.replace("即将", "").trim() + "」即将上线 🌱");
+        var nm = n.querySelector(".mn").textContent.replace(/即将/g, "").replace(/·.*/, "").trim();
+        if (n.dataset.live === "1" && n.dataset.url) openModule(n.dataset.url, nm);
+        else toast("「" + nm + "」即将上线 🌱");
       });
     });
   }
@@ -378,6 +399,7 @@
   var R = { overview: renderOverview, verbal: renderVerbal, rewards: renderRewards, me: renderMe };
   function render() { refreshTop(); (R[current] || renderOverview)(); }
   function go(tab) {
+    closeModule();
     current = tab;
     [].forEach.call(tabbar.querySelectorAll(".tab"), function (b) { b.classList.toggle("active", b.dataset.tab === tab); });
     window.scrollTo(0, 0);
@@ -426,7 +448,7 @@
     var avatars = ["🧑🏻", "👩🏻", "🧑🏻‍🎓", "👨🏻‍💻", "👩🏻‍🎨", "🧑🏽", "👩🏽‍🔬", "🧑🏻‍🏫"];
     var pick = { name: S.profile.name || "", avatar: S.profile.avatar || "🧑🏻" };
     var box = document.createElement("div");
-    box.id = "login"; box.className = "login"; box.style.setProperty("--login-img", "url(assets/login.jpg)");
+    box.id = "login"; box.className = "login"; box.style.setProperty("--login-img", "url(/assets/login.jpg)");
     function finish(name) {
       S.profile.name = ((name || pick.name || "润友") + "").trim() || "润友";
       S.profile.avatar = pick.avatar; S.profile.authed = true; save();
