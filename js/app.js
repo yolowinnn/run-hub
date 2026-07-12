@@ -13,6 +13,7 @@
     todayTracks: [],            // 今天点过的赛道
     readiness: { verbal: 62, culture: 44, quant: 53, tech: 28 },
     chestOpenedOn: null,
+    profile: { name: null, avatar: "🧑🏻", authed: false },
     cfg: { lang: null, country: null, difficulty: null, dailyGoal: 3, configured: false },
   };
   function todayStr() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
@@ -88,7 +89,7 @@
     h += '<div class="hub-hero fade">' +
       '<div class="art" style="background-image:url(assets/hero.jpg)"></div>' +
       '<div class="body">' +
-      '<div class="greet">' + greeting() + '，准备出发的人 👋</div>' +
+      '<div class="greet">' + greeting() + '，' + esc((S.profile && S.profile.name) || "准备出发的人") + ' 👋</div>' +
       '<h1>把每天的学习，攒成出去的底气。</h1>' +
       '<div class="goalline"><span class="gchip">🔥 ' + S.streak + ' 天连胜</span>' +
       '<span class="gchip">' + (goalMet() ? "今日达标 ✅" : "今天还差 " + (RUN.dailyGoalTracks - S.todayTracks.length) + " 门") + '</span></div>' +
@@ -419,8 +420,42 @@
   st.textContent = "@keyframes drop{to{transform:translateY(110vh) rotate(600deg);opacity:.85}}";
   document.head.appendChild(st);
 
+  // ---------- 登录 / 欢迎屏 ----------
+  function showLogin() {
+    if (document.getElementById("login")) return;
+    var avatars = ["🧑🏻", "👩🏻", "🧑🏻‍🎓", "👨🏻‍💻", "👩🏻‍🎨", "🧑🏽", "👩🏽‍🔬", "🧑🏻‍🏫"];
+    var pick = { name: S.profile.name || "", avatar: S.profile.avatar || "🧑🏻" };
+    var box = document.createElement("div");
+    box.id = "login"; box.className = "login"; box.style.setProperty("--login-img", "url(assets/login.jpg)");
+    function finish(name) {
+      S.profile.name = ((name || pick.name || "润友") + "").trim() || "润友";
+      S.profile.avatar = pick.avatar; S.profile.authed = true; save();
+      box.remove(); refreshTop();
+      if (!S.cfg || !S.cfg.configured) showOnboarding(false); else render();
+    }
+    function paint() {
+      box.innerHTML = '<div class="login-card">' +
+        '<div class="brand"><img src="assets/logo.png" alt=""/><b>润<span>·Rùn</span></b></div>' +
+        '<h2>欢迎，准备出发的人 👋</h2>' +
+        '<div class="ls">把每天的学习，攒成出去的底气。取个名、选个头像就开始。</div>' +
+        '<div class="avpick">' + avatars.map(function (a) { return '<button data-av="' + a + '"' + (pick.avatar === a ? ' class="on"' : '') + '>' + a + '</button>'; }).join("") + '</div>' +
+        '<input id="lname" placeholder="你的昵称" value="' + esc(pick.name) + '" maxlength="16"/>' +
+        '<button class="cta" id="lstart">开始学习 →</button>' +
+        '<div class="social"><button data-soc="google">🟢 Google</button><button data-soc="wechat">💬 微信</button><button data-soc="apple">🍎 Apple</button></div>' +
+        '<div class="skip" id="lskip">先随便逛逛</div>' +
+        '<div class="terms">继续即表示同意用户协议与隐私政策（示例）</div></div>';
+      box.querySelectorAll("[data-av]").forEach(function (n) { n.addEventListener("click", function () { pick.avatar = n.dataset.av; paint(); }); });
+      var inp = box.querySelector("#lname"); if (inp) inp.addEventListener("input", function () { pick.name = inp.value; });
+      box.querySelector("#lstart").addEventListener("click", function () { finish(inp ? inp.value : ""); });
+      box.querySelectorAll("[data-soc]").forEach(function (n) { n.addEventListener("click", function () { finish(pick.name || "润友"); }); });
+      box.querySelector("#lskip").addEventListener("click", function () { finish(pick.name || "润友"); });
+    }
+    document.body.appendChild(box); paint();
+  }
+
   // ---------- boot ----------
   if (S.cfg && S.cfg.dailyGoal) RUN.dailyGoalTracks = S.cfg.dailyGoal;
   render();
-  if (!S.cfg || !S.cfg.configured) showOnboarding(false);
+  if (!S.profile || !S.profile.authed) showLogin();
+  else if (!S.cfg || !S.cfg.configured) showOnboarding(false);
 })();

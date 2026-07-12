@@ -226,4 +226,69 @@ a{color:var(--green-deep);text-decoration:none}
 .onb .result-ring .big{font-family:var(--serif);font-size:40px;font-weight:600;color:var(--gold)}
 
 @media(min-width:560px){ .hub-hero .art{height:250px} .modgrid{grid-template-columns:1fr 1fr 1fr} }
+
+/* ===== 登录 / 欢迎屏 ===== */
+.login{ position:fixed; inset:0; z-index:300; display:flex; align-items:flex-end; justify-content:center; overflow:hidden;
+  background-image:linear-gradient(to top, rgba(8,26,15,.82) 0%, rgba(10,32,18,.28) 42%, rgba(10,32,18,.08) 100%), var(--login-img);
+  background-size:cover; background-position:center 30%; padding:0 18px env(safe-area-inset-bottom); }
+.login-card{ width:100%; max-width:440px; background:color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter:blur(18px) saturate(1.3); -webkit-backdrop-filter:blur(18px) saturate(1.3);
+  border:1px solid var(--line); border-radius:26px 26px 0 0; box-shadow:0 -10px 50px -20px rgba(0,0,0,.5); padding:26px 24px calc(26px + env(safe-area-inset-bottom)); margin-bottom:0; animation:lup .5s cubic-bezier(.22,1,.36,1) both; }
+@keyframes lup{ from{ opacity:0; transform:translateY(30px) } to{ opacity:1; transform:none } }
+.login-card .brand{ display:flex; align-items:center; gap:10px; margin-bottom:14px }
+.login-card .brand img{ width:38px; height:38px; border-radius:11px; box-shadow:var(--sh-sm) }
+.login-card .brand b{ font-family:var(--serif); font-size:23px } .login-card .brand b span{ font-size:14px; color:var(--ink-faint) }
+.login-card h2{ font-family:var(--serif); font-size:22px; margin:2px 0 4px } .login-card .ls{ font-size:13.5px; color:var(--ink-soft); margin-bottom:16px }
+.avpick{ display:flex; gap:8px; margin:0 0 12px; flex-wrap:wrap }
+.avpick button{ font-size:24px; width:44px; height:44px; border-radius:12px; border:1.5px solid var(--line); background:var(--surface-2); cursor:pointer }
+.avpick button.on{ border-color:var(--green); background:var(--tint) }
+.login-card input{ width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:13px; background:var(--surface-2); font:inherit; color:var(--ink); margin-bottom:10px; outline:none }
+.login-card input:focus{ border-color:var(--green) }
+.login-card .cta{ width:100%; background:linear-gradient(135deg,var(--green-deep),var(--green)); color:#fff; border:none; border-radius:14px; font-weight:700; font-size:15.5px; padding:14px; cursor:pointer; box-shadow:0 8px 20px -10px var(--green) }
+.login-card .cta:disabled{ opacity:.45 }
+.login-card .social{ display:flex; gap:10px; margin:12px 0 0 }
+.login-card .social button{ flex:1; background:var(--surface); border:1.5px solid var(--line); border-radius:13px; padding:11px; font-weight:600; font-size:13.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px }
+.login-card .skip{ text-align:center; margin-top:14px; font-size:13px; color:var(--ink-faint); cursor:pointer }
+.login-card .terms{ text-align:center; margin-top:12px; font-size:11px; color:var(--ink-faint) }
+@media(min-width:720px){ .login{ align-items:center } .login-card{ border-radius:26px; margin-bottom:0 } }
+
+/* ===== 桌面全屏布局：底部 tab → 左侧栏，内容加宽多列 ===== */
+.side-brand{ display:none; }
+@media(min-width:980px){
+  :root{ --side:240px; }
+  body{ padding-left:var(--side); }
+  /* 底部 tabbar 变成左侧竖向导航 */
+  #tabbar{
+    top:0; bottom:0; left:0; right:auto; width:var(--side); height:100vh;
+    flex-direction:column; justify-content:flex-start; align-items:stretch; gap:5px;
+    padding:88px 16px 22px; border-top:none; border-right:1px solid var(--line);
+    background:color-mix(in srgb, var(--surface) 78%, var(--bg));
+  }
+  #tabbar .tab{ flex:0 0 auto; flex-direction:row; justify-content:flex-start; gap:13px; padding:12px 15px; border-radius:13px; font-size:15px; padding-top:12px; }
+  #tabbar .tab .ti{ font-size:21px; transform:none; filter:grayscale(.3) opacity(.8); }
+  #tabbar .tab.active{ background:var(--tint); color:var(--green-deep); }
+  #tabbar .tab.active .ti{ transform:none; filter:none; }
+  #tabbar .tab.active::before{ display:none; }
+  /* 侧栏顶部品牌 */
+  .side-brand{ position:fixed; top:0; left:0; width:var(--side); height:74px; display:flex; align-items:center; gap:10px; padding:0 20px; z-index:41; border-right:1px solid var(--line); background:color-mix(in srgb, var(--surface) 78%, var(--bg)); }
+  .side-brand img{ width:30px; height:30px; border-radius:9px; box-shadow:var(--sh-sm); }
+  .side-brand b{ font-family:var(--serif); font-size:21px; }
+  .side-brand b span{ font-size:13px; color:var(--ink-faint); }
+  /* 顶栏右移、加宽 */
+  #topbar{ left:var(--side); }
+  .tb-inner{ max-width:1080px; margin:0 auto; padding:0 40px; }
+  .tb-left{ visibility:hidden; }               /* 品牌移到侧栏，顶栏只留积分 */
+  #view{ max-width:1080px; margin:0 auto; padding:22px 40px 48px; }
+  /* 内容多列，填满宽度 */
+  .hub-hero .art{ height:300px; }
+  .tracks{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .modgrid{ grid-template-columns:1fr 1fr 1fr; }
+  .store{ grid-template-columns:1fr 1fr 1fr 1fr; }
+  .ladder{ max-width:640px; }
+  .readi{ padding:24px 26px; }
+  /* Verbal / rewards / me 的两列容器 */
+  .mods, .tracks{ }
+}
+@media(min-width:1200px){
+  #view,.tb-inner{ max-width:1160px; }
+}
 @media(prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
