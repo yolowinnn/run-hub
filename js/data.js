@@ -50,7 +50,8 @@ window.RUN = {
     { icon: "🔁", name: "词汇 · SRS", desc: "间隔重复背单词，闪卡 + 例句。", tag: "342 词", url: "https://ielts75.vercel.app/" },
     { icon: "🎧", name: "听 · 读 · 写", desc: "雅思四项模块化练习。", tag: "8 周计划", url: "https://ielts75.vercel.app/" },
     { icon: "🗣️", name: "口语 · AI 反馈", desc: "GPT 即时批改打分（杀手锏）。", tag: "GPT", url: "https://ielts75.vercel.app/" },
-    { icon: "➕", name: "未来扩充", desc: "GRE / 托福 / 日语 / 西语——加个 tab 就行。", tag: "Roadmap", url: null },
+    { icon: "🇫🇷", name: "法语 / 德语", desc: "4 档分级 (A1–C1)：词汇·短句·语法。", tag: "已上线", url: "https://run-lang.vercel.app/" },
+    { icon: "➕", name: "更多语言", desc: "日语 / 西语 / GRE / 托福——加档即可。", tag: "Roadmap", url: null },
   ],
 
   // 奖励商店（润豆兑换）
