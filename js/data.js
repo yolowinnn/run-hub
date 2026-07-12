@@ -117,6 +117,6 @@ window.RUN = {
     { key: "fitness", icon: "💪", name: "健身", desc: "训练·饮食·睡眠·清单", url: "https://run-modules.vercel.app/#fitness", live: true, group: "终身提升" },
     { key: "dance", icon: "💃", name: "跳舞 / 艺术", desc: "含乐器扒谱", url: "https://chordscribe-lake.vercel.app/", live: true, group: "终身提升" },
     { key: "style", icon: "✨", name: "形象 Style", desc: "护肤·美白·穿搭", url: "https://run-modules.vercel.app/#style", live: true, group: "终身提升" },
-    { key: "buddy", icon: "🤝", name: "润人搭子", desc: "找搭子·组队", url: null, live: false, group: "社区" },
+    { key: "buddy", icon: "🤝", name: "润人搭子", desc: "按目标匹配搭子·聚合Agent", url: "https://run-api-mu.vercel.app/", live: true, group: "社区" },
   ],
 };
