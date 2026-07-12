@@ -112,6 +112,7 @@ window.RUN = {
     { key: "culture", icon: "🏛️", name: "文化 Culture", desc: "多国文化融入", url: "https://homeroom-orcin.vercel.app/", live: true, group: "出海准备" },
     { key: "quant", icon: "📈", name: "Quant / 技术", desc: "面试硬技能", url: "https://quant-ai-prep.vercel.app/", live: true, group: "出海准备" },
     { key: "apply", icon: "🎓", name: "留学申请", desc: "选校·文书·时间线", url: "https://run-modules.vercel.app/#apply", live: true, group: "出海准备" },
+    { key: "visa", icon: "🛂", name: "签证", desc: "签证阶梯·各国对比·拒签破解", url: "https://run-modules.vercel.app/#visa", live: true, group: "出海准备" },
     { key: "career", icon: "💼", name: "海外找工", desc: "简历·内推·身份", url: "https://run-modules.vercel.app/#career", live: true, group: "出海准备" },
     { key: "mystic", icon: "🔮", name: "玄学定位", desc: "八字/星座/MBTI 荐国家", url: "https://run-modules.vercel.app/#mystic", live: true, group: "出海准备" },
     { key: "fitness", icon: "💪", name: "健身", desc: "训练·饮食·睡眠·清单", url: "https://run-modules.vercel.app/#fitness", live: true, group: "终身提升" },
