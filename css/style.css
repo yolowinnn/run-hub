@@ -180,5 +180,50 @@ a{color:var(--green-deep);text-decoration:none}
 .toast{background:var(--green-ink);color:#eafaf0;font-size:14px;font-weight:600;padding:11px 18px;border-radius:12px;box-shadow:0 10px 26px rgba(0,0,0,.28);animation:tin .3s both}
 @keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-@media(min-width:560px){ .hub-hero .art{height:250px} }
+/* ===== module directory ===== */
+.modgroup{margin-top:6px}
+.modgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:10px}
+.modcard{position:relative;display:flex;align-items:center;gap:11px;padding:13px 13px;border:1px solid var(--line);border-radius:15px;background:var(--surface);box-shadow:var(--sh-sm);cursor:pointer;transition:transform .12s,border-color .2s}
+.modcard:active{transform:scale(.98)}
+.modcard.soon{opacity:.72;cursor:default}
+.modcard .mi{width:38px;height:38px;border-radius:11px;background:var(--tint);border:1px solid var(--tint-line);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.modcard .mm{min-width:0}
+.modcard .mn{font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:6px}
+.modcard .md{font-size:11.5px;color:var(--ink-faint);margin-top:1px}
+.modcard .soonpill{font-size:9px;font-family:var(--mono);font-weight:700;color:var(--gold);background:var(--gold-soft);border-radius:5px;padding:1px 5px}
+
+/* ===== settings ===== */
+.setblock{border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--sh-sm);padding:6px 16px;margin-top:12px}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.setrow:last-child{border-bottom:none}
+.setrow .k{font-size:14px;font-weight:600}
+.setrow .k small{display:block;font-weight:400;font-size:12px;color:var(--ink-faint);margin-top:1px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}
+.chip2{font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-soft);cursor:pointer}
+.chip2.on{background:var(--green);color:#fff;border-color:var(--green)}
+.chip2.lock{opacity:.5;cursor:not-allowed}
+
+/* ===== onboarding overlay ===== */
+.onb{position:fixed;inset:0;z-index:200;background:linear-gradient(160deg,var(--green-ink),#0a3a21);color:#eafaf0;overflow-y:auto;padding:env(safe-area-inset-top) 0 40px}
+.onb-in{max-width:520px;margin:0 auto;padding:32px 24px}
+.onb .step-n{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.onb h2{color:#fff;font-size:26px;margin:8px 0 6px}
+.onb .sub{color:rgba(234,250,240,.82);font-size:14px;margin-bottom:20px}
+.onb .opts{display:flex;flex-direction:column;gap:10px}
+.onb .obtn{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;border:1.5px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;font-size:15px;font-weight:600;cursor:pointer;text-align:left;width:100%}
+.onb .obtn:hover{border-color:var(--gold)}
+.onb .obtn.sel{border-color:var(--gold);background:rgba(224,175,63,.16)}
+.onb .obtn .big{font-size:22px}
+.onb .obtn .sm{font-size:12px;font-weight:400;opacity:.75;margin-left:auto}
+.onb .obtn.dim{opacity:.5}
+.onb .qtext{font-size:16px;font-weight:600;color:#fff;margin:2px 0 12px}
+.onb .prog{height:5px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden;margin-bottom:22px}
+.onb .prog i{display:block;height:100%;background:var(--gold);border-radius:99px;transition:width .3s}
+.onb .cta{margin-top:22px;background:#fff;color:var(--green-deep);border:none;border-radius:13px;font-weight:700;font-size:15px;padding:14px;width:100%;cursor:pointer}
+.onb .cta:disabled{opacity:.4}
+.onb .skip{margin-top:14px;text-align:center;font-size:13px;color:rgba(234,250,240,.6);cursor:pointer}
+.onb .result-ring{text-align:center;margin:10px 0 6px}
+.onb .result-ring .big{font-family:var(--serif);font-size:40px;font-weight:600;color:var(--gold)}
+
+@media(min-width:560px){ .hub-hero .art{height:250px} .modgrid{grid-template-columns:1fr 1fr 1fr} }
 @media(prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }

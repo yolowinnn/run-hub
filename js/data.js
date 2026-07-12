@@ -72,4 +72,50 @@ window.RUN = {
 
   dailyGoalTracks: 3, // 一天点满 N 门才算达标、开宝箱
   beansPerCheckin: 30,
+
+  // ---- 配置：语言 / 难度 / 国家（默认可改） ----
+  languages: [
+    { key: "en", name: "English", flag: "🇬🇧", tagline: "雅思/托福", ready: true },
+    { key: "fr", name: "Français", flag: "🇫🇷", tagline: "DELF/DALF", ready: false },
+    { key: "de", name: "Deutsch", flag: "🇩🇪", tagline: "TestDaF/Goethe", ready: false },
+    { key: "ja", name: "日本語", flag: "🇯🇵", tagline: "JLPT", ready: false },
+    { key: "es", name: "Español", flag: "🇪🇸", tagline: "DELE", ready: false },
+  ],
+  difficulties: [
+    { key: "starter", name: "入门", en: "Starter", desc: "零基础起步" },
+    { key: "basic", name: "基础", en: "Basic", desc: "有一点底子" },
+    { key: "adv", name: "进阶", en: "Advanced", desc: "中–偏高（现雅思档）" },
+    { key: "elite", name: "高阶", en: "Elite", desc: "冲刺高分" },
+  ],
+  countries: [
+    { key: "us", name: "美国", flag: "🇺🇸", lang: "en" },
+    { key: "uk", name: "英国", flag: "🇬🇧", lang: "en" },
+    { key: "ca", name: "加拿大", flag: "🇨🇦", lang: "en" },
+    { key: "au", name: "澳大利亚", flag: "🇦🇺", lang: "en" },
+    { key: "fr", name: "法国", flag: "🇫🇷", lang: "fr" },
+    { key: "de", name: "德国", flag: "🇩🇪", lang: "de" },
+    { key: "sg", name: "新加坡", flag: "🇸🇬", lang: "en" },
+  ],
+  // 5 题快速定级：难度递增，答对越多档越高
+  placement: [
+    { q: "Choose the correct: “She ___ to school every day.”", opts: ["go", "goes", "going", "gone"], a: 1, lv: 0 },
+    { q: "“I have lived here ___ 2019.”", opts: ["since", "for", "from", "at"], a: 0, lv: 1 },
+    { q: "Closest meaning of “ubiquitous”:", opts: ["rare", "everywhere", "ancient", "hidden"], a: 1, lv: 2 },
+    { q: "“Had I known, I ___ differently.”", opts: ["will act", "would have acted", "act", "acted"], a: 1, lv: 2 },
+    { q: "“The argument was ___; it convinced no one.”", opts: ["cogent", "specious", "lucid", "salient"], a: 1, lv: 3 },
+  ],
+
+  // ---- 全平台模块目录（总入口） ----
+  modules: [
+    { key: "language", icon: "🗣️", name: "语言 Verbal", desc: "多语言·分级", url: "https://ielts75.vercel.app/", live: true, group: "出海准备" },
+    { key: "culture", icon: "🏛️", name: "文化 Culture", desc: "多国文化融入", url: "https://homeroom-orcin.vercel.app/", live: true, group: "出海准备" },
+    { key: "quant", icon: "📈", name: "Quant / 技术", desc: "面试硬技能", url: "https://quant-ai-prep.vercel.app/", live: true, group: "出海准备" },
+    { key: "apply", icon: "🎓", name: "留学申请", desc: "选校·文书·时间线", url: null, live: false, group: "出海准备" },
+    { key: "career", icon: "💼", name: "海外找工", desc: "简历·内推·身份", url: null, live: false, group: "出海准备" },
+    { key: "mystic", icon: "🔮", name: "玄学定位", desc: "八字/星座/MBTI 荐国家", url: null, live: false, group: "出海准备" },
+    { key: "fitness", icon: "💪", name: "健身", desc: "训练·饮食·睡眠·清单", url: null, live: false, group: "终身提升" },
+    { key: "dance", icon: "💃", name: "跳舞 / 艺术", desc: "含乐器扒谱", url: "https://chordscribe-lake.vercel.app/", live: true, group: "终身提升" },
+    { key: "style", icon: "✨", name: "形象 Style", desc: "护肤·美白·穿搭", url: null, live: false, group: "终身提升" },
+    { key: "buddy", icon: "🤝", name: "润人搭子", desc: "找搭子·组队", url: null, live: false, group: "社区" },
+  ],
 };

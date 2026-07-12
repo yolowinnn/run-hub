@@ -13,6 +13,7 @@
     todayTracks: [],            // 今天点过的赛道
     readiness: { verbal: 62, culture: 44, quant: 53, tech: 28 },
     chestOpenedOn: null,
+    cfg: { lang: null, country: null, difficulty: null, dailyGoal: 3, configured: false },
   };
   function todayStr() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
   var S = load();
@@ -124,6 +125,9 @@
     });
     h += '</div>';
 
+    // 全部模块目录（总入口）
+    h += moduleDirHTML();
+
     // league
     h += '<div class="sec-h"><h2>本周联赛</h2><span class="lnk" data-tab="rewards">奖励 →</span></div>';
     h += '<div class="card league fade"><span class="medal">' + lg.m + '</span>' +
@@ -135,7 +139,32 @@
     var cb = document.getElementById("chestBtn");
     if (cb) cb.addEventListener("click", openChest);
     bindStudy();
+    bindModules();
     view.querySelectorAll("[data-tab]").forEach(function (n) { n.addEventListener("click", function () { go(n.dataset.tab); }); });
+  }
+
+  function moduleDirHTML() {
+    var groups = ["出海准备", "终身提升", "社区"];
+    var h = '<div class="sec-h"><h2>全部模块</h2><span class="faint small">润 · 一个总入口</span></div>';
+    groups.forEach(function (g) {
+      var mods = RUN.modules.filter(function (m) { return m.group === g; });
+      if (!mods.length) return;
+      h += '<div class="modgroup"><div class="ph-sec" style="font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin:14px 2px 2px">' + g + '</div><div class="modgrid">';
+      mods.forEach(function (m) {
+        h += '<div class="modcard' + (m.live ? "" : " soon") + '" data-mod="' + m.key + '" data-url="' + (m.url || "") + '" data-live="' + (m.live ? 1 : 0) + '">' +
+          '<div class="mi">' + m.icon + '</div><div class="mm"><div class="mn">' + m.name + (m.live ? "" : ' <span class="soonpill">即将</span>') + '</div><div class="md">' + m.desc + '</div></div></div>';
+      });
+      h += '</div></div>';
+    });
+    return h;
+  }
+  function bindModules() {
+    view.querySelectorAll("[data-mod]").forEach(function (n) {
+      n.addEventListener("click", function () {
+        if (n.dataset.live === "1" && n.dataset.url) window.open(n.dataset.url, "_blank", "noopener");
+        else toast("「" + n.querySelector(".mn").textContent.replace("即将", "").trim() + "」即将上线 🌱");
+      });
+    });
   }
 
   function renderVerbal() {
@@ -203,12 +232,138 @@
         '<div class="barx"><i style="width:' + (S.readiness[t.key] || 0) + '%;background:' + trackGradCSS(t) + '"></i></div></div>';
     });
     h += '</div>';
-    h += '<div class="note fade">润 · Rùn 是一个把英语、美国文化、Quant、技术揉进一个日常习惯的学习打卡站。每一次点开学习，都是离「能走」更近一步。</div>';
-    h += '<button class="btn soft fade" id="resetBtn" style="margin-top:16px">重置我的进度</button>';
+    h += '<div class="sec-h"><h2>配置</h2><span class="faint small">默认可改</span></div>';
+    h += settingsHTML();
+    h += '<div class="note fade" style="margin-top:14px">润 · Rùn 是一个把语言、文化、Quant、技术、身心揉进一个日常习惯的学习打卡站。每一次点开学习，都是离「能走」更近一步。</div>';
+    h += '<button class="btn soft fade" id="reonbBtn" style="margin-top:16px">重新做引导配置</button>';
+    h += '<button class="btn soft fade" id="wipeBtn" style="margin-top:10px;color:var(--ink-faint);border-color:var(--line)">重置全部进度</button>';
     view.innerHTML = h;
-    document.getElementById("resetBtn").addEventListener("click", function () {
-      if (confirm("确定重置全部进度？")) { localStorage.removeItem(KEY); S = load(); toast("已重置"); render(); }
+    bindSettings();
+    document.getElementById("reonbBtn").addEventListener("click", function () { showOnboarding(true); });
+    document.getElementById("wipeBtn").addEventListener("click", function () {
+      if (confirm("确定重置全部进度？")) { localStorage.removeItem(KEY); S = load(); toast("已重置"); location.reload(); }
     });
+  }
+
+  // ---------- 配置 / 设置 ----------
+  function langName(k) { var l = RUN.languages.find(function (x) { return x.key === k; }); return l ? l.flag + " " + l.name : "未设"; }
+  function diffName(k) { var d = RUN.difficulties.find(function (x) { return x.key === k; }); return d ? d.name : "未设"; }
+  function countryName(k) { var c = RUN.countries.find(function (x) { return x.key === k; }); return c ? c.flag + " " + c.name : "未设"; }
+  function settingsHTML() {
+    var c = S.cfg;
+    var h = '<div class="setblock fade">';
+    // 语言
+    h += '<div class="setrow"><div class="k">学习语言<small>选定即默认</small></div><div class="chips">' +
+      RUN.languages.map(function (l) {
+        return '<button class="chip2 ' + (c.lang === l.key ? "on" : "") + (l.ready ? "" : " lock") + '" data-set="lang" data-v="' + l.key + '"' + (l.ready ? "" : " disabled") + '>' + l.flag + " " + l.name + '</button>';
+      }).join("") + '</div></div>';
+    // 难度
+    h += '<div class="setrow"><div class="k">难度档位<small>覆盖入门→高阶</small></div><div class="chips">' +
+      RUN.difficulties.map(function (d) {
+        return '<button class="chip2 ' + (c.difficulty === d.key ? "on" : "") + '" data-set="difficulty" data-v="' + d.key + '">' + d.name + '</button>';
+      }).join("") + '</div></div>';
+    // 国家/文化
+    h += '<div class="setrow"><div class="k">目标国家 / 文化<small>默认文化跟着走</small></div><div class="chips">' +
+      RUN.countries.map(function (co) {
+        return '<button class="chip2 ' + (c.country === co.key ? "on" : "") + '" data-set="country" data-v="' + co.key + '">' + co.flag + " " + co.name + '</button>';
+      }).join("") + '</div></div>';
+    // 每日目标
+    h += '<div class="setrow"><div class="k">每日目标<small>点满几门算达标</small></div><div class="chips">' +
+      [2, 3, 4].map(function (n) {
+        return '<button class="chip2 ' + (c.dailyGoal === n ? "on" : "") + '" data-set="dailyGoal" data-v="' + n + '">' + n + ' 门</button>';
+      }).join("") + '</div></div>';
+    h += '</div>';
+    return h;
+  }
+  function bindSettings() {
+    view.querySelectorAll("[data-set]").forEach(function (n) {
+      n.addEventListener("click", function () {
+        if (n.disabled) return;
+        var key = n.dataset.set, v = n.dataset.v;
+        if (key === "dailyGoal") { S.cfg.dailyGoal = +v; RUN.dailyGoalTracks = +v; }
+        else S.cfg[key] = v;
+        S.cfg.configured = true;
+        save(); toast("已更新配置"); render();
+      });
+    });
+  }
+
+  // ---------- 引导配置 onboarding ----------
+  function showOnboarding(force) {
+    if (document.getElementById("onb")) return;
+    var pick = { lang: S.cfg.lang, country: S.cfg.country };
+    var ans = [];           // placement answers
+    var step = 0;           // 0 lang, 1 country, 2..(2+n-1) placement, last: result
+    var P = RUN.placement, nP = P.length;
+    var box = document.createElement("div");
+    box.id = "onb"; box.className = "onb";
+    document.body.appendChild(box);
+
+    function recDifficulty() {
+      var correct = ans.reduce(function (a, ok) { return a + (ok ? 1 : 0); }, 0);
+      return correct <= 1 ? "starter" : correct === 2 ? "basic" : correct <= 4 ? "adv" : "elite";
+    }
+    function close() { box.remove(); }
+    function finish() {
+      S.cfg.lang = pick.lang || "en";
+      S.cfg.country = pick.country || "us";
+      S.cfg.difficulty = recDifficulty();
+      S.cfg.configured = true;
+      save(); close(); toast("配置完成，开学！🌱"); render();
+    }
+    function paint() {
+      var totalSteps = 2 + nP; // lang + country + placement
+      var prog = Math.round((step / (totalSteps)) * 100);
+      var h = '<div class="onb-in">';
+      h += '<div class="prog"><i style="width:' + prog + '%"></i></div>';
+
+      if (step === 0) {
+        h += '<div class="step-n">Step 1 · 语言</div><h2>你想学哪门语言？</h2><div class="sub">选定后成为默认，之后可在设置里改。</div><div class="opts">';
+        RUN.languages.forEach(function (l) {
+          h += '<button class="obtn ' + (pick.lang === l.key ? "sel" : "") + (l.ready ? "" : " dim") + '" data-lang="' + l.key + '"><span class="big">' + l.flag + '</span> ' + l.name + '<span class="sm">' + (l.ready ? l.tagline : "即将上线") + '</span></button>';
+        });
+        h += '</div><button class="cta" id="next"' + (pick.lang ? "" : " disabled") + '>下一步</button>';
+      } else if (step === 1) {
+        h += '<div class="step-n">Step 2 · 目标国家</div><h2>想润去哪？</h2><div class="sub">文化模块会默认跟着你的目标国家走。</div><div class="opts">';
+        RUN.countries.forEach(function (c) {
+          h += '<button class="obtn ' + (pick.country === c.key ? "sel" : "") + '" data-country="' + c.key + '"><span class="big">' + c.flag + '</span> ' + c.name + '</button>';
+        });
+        h += '</div><button class="cta" id="next"' + (pick.country ? "" : " disabled") + '>做个分级测试 →</button>';
+      } else if (step >= 2 && step < 2 + nP) {
+        var qi = step - 2, Q = P[qi];
+        h += '<div class="step-n">分级测试 · ' + (qi + 1) + " / " + nP + '</div><h2 style="font-size:22px">测一下水平</h2><div class="qtext">' + esc(Q.q) + '</div><div class="opts">';
+        Q.opts.forEach(function (o, oi) {
+          h += '<button class="obtn" data-opt="' + oi + '">' + esc(o) + '</button>';
+        });
+        h += '</div>';
+      } else {
+        var d = RUN.difficulties.find(function (x) { return x.key === recDifficulty(); });
+        h += '<div class="step-n">完成</div><h2>给你配好了</h2>' +
+          '<div class="result-ring"><div class="big">' + d.name + '</div><div class="sub">' + d.en + " · " + d.desc + '</div></div>' +
+          '<div class="opts" style="margin-top:8px">' +
+          '<div class="obtn" style="cursor:default"><span class="big">' + (RUN.languages.find(function (x) { return x.key === (pick.lang || "en"); }) || {}).flag + '</span> ' + (RUN.languages.find(function (x) { return x.key === (pick.lang || "en"); }) || {}).name + '<span class="sm">语言</span></div>' +
+          '<div class="obtn" style="cursor:default"><span class="big">' + (RUN.countries.find(function (x) { return x.key === (pick.country || "us"); }) || {}).flag + '</span> ' + (RUN.countries.find(function (x) { return x.key === (pick.country || "us"); }) || {}).name + '<span class="sm">目标</span></div>' +
+          '</div><button class="cta" id="done">进入润 · 开学</button><div class="skip" id="tweak">难度不对？进去后可在设置里改</div>';
+      }
+      h += (step < 2 + nP && !force ? '' : '');
+      if (step === 0) h += '<div class="skip" id="skip">先跳过，用默认配置</div>';
+      h += '</div>';
+      box.innerHTML = h;
+
+      // bind
+      box.querySelectorAll("[data-lang]").forEach(function (n) { n.addEventListener("click", function () { pick.lang = n.dataset.lang; paint(); }); });
+      box.querySelectorAll("[data-country]").forEach(function (n) { n.addEventListener("click", function () { pick.country = n.dataset.country; paint(); }); });
+      box.querySelectorAll("[data-opt]").forEach(function (n) {
+        n.addEventListener("click", function () {
+          var qi = step - 2; ans[qi] = (+n.dataset.opt === P[qi].a); step++; paint();
+        });
+      });
+      var nx = box.querySelector("#next"); if (nx) nx.addEventListener("click", function () { step++; paint(); });
+      var dn = box.querySelector("#done"); if (dn) dn.addEventListener("click", finish);
+      var sk = box.querySelector("#skip"); if (sk) sk.addEventListener("click", function () { pick.lang = pick.lang || "en"; pick.country = pick.country || "us"; ans = [true, true, false]; finish(); });
+      var tw = box.querySelector("#tweak"); if (tw) tw.addEventListener("click", finish);
+    }
+    paint();
   }
 
   function bindStudy() {
@@ -237,6 +392,7 @@
   });
 
   // ---------- helpers ----------
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function toast(msg) {
     var host = document.getElementById("toast-host");
     host.innerHTML = '<div class="toast">' + msg + "</div>";
@@ -264,5 +420,7 @@
   document.head.appendChild(st);
 
   // ---------- boot ----------
+  if (S.cfg && S.cfg.dailyGoal) RUN.dailyGoalTracks = S.cfg.dailyGoal;
   render();
+  if (!S.cfg || !S.cfg.configured) showOnboarding(false);
 })();
