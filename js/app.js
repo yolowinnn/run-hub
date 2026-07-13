@@ -15,6 +15,7 @@
     chestOpenedOn: null,
     profile: { name: null, avatar: "🧑🏻", authed: false },
     cfg: { lang: null, country: null, difficulty: null, dailyGoal: 3, configured: false },
+    modXP: {},                  // 各内嵌模块上报累积的赚分
   };
   function todayStr() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
   var S = load();
@@ -27,7 +28,8 @@
       return s;
     } catch (e) { return Object.assign({}, seed); }
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function saveLocal() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function save() { saveLocal(); if (window.RunSync && RunSync.push) RunSync.push(); }
 
   // ---------- 计算 ----------
   function readinessOverall() {
@@ -246,6 +248,16 @@
       '<div class="stat"><div class="n">' + ov + '</div><div class="l">润力值</div></div>' +
       '<div class="stat"><div class="n">🫘 ' + S.beans + '</div><div class="l">润豆</div></div>' +
       '<div class="stat"><div class="n">' + S.leagueXP + '</div><div class="l">总 XP</div></div></div>';
+    // 账号 + 跨端同步
+    if (window.RunSync && RunSync.configured()) {
+      var u = RunSync.currentUser && RunSync.currentUser();
+      h += '<div class="sec-h"><h2>账号</h2><span id="syncbadge" class="faint small">' + syncLabel(syncStatus) + '</span></div>';
+      h += '<div class="card acct fade">';
+      if (u && !u.isAnonymous) h += '<div class="acct-m"><div class="t">' + esc(u.email || S.profile.name || "已登录") + '</div><div class="s">润豆与进度已跨端同步 · 换设备登录同一账号即可恢复</div></div><button class="btn soft" id="signout">退出登录</button>';
+      else if (u && u.isAnonymous) h += '<div class="acct-m"><div class="t">访客模式</div><div class="s">用 Google 登录，换设备也能同步、清缓存也不丢进度</div></div><button class="btn" id="signin-g">用 Google 登录</button>';
+      else h += '<div class="acct-m"><div class="t">未登录</div><div class="s">登录后润豆与各模块进度跨端同步</div></div><button class="btn" id="signin-g">用 Google 登录</button>';
+      h += '</div>';
+    }
     h += '<div class="sec-h"><h2>各赛道准备度</h2></div><div class="tracks">';
     RUN.tracks.forEach(function (t) {
       h += '<div class="trk"><div class="row"><div class="ic" style="background:' + trackGradCSS(t) + '">' + t.icon + '</div>' +
@@ -261,6 +273,8 @@
     h += '<button class="btn soft fade" id="wipeBtn" style="margin-top:10px;color:var(--ink-faint);border-color:var(--line)">重置全部进度</button>';
     view.innerHTML = h;
     bindSettings();
+    var so = document.getElementById("signout"); if (so) so.addEventListener("click", function () { RunSync.signOut().then(function () { toast("已退出登录"); setTimeout(function () { location.reload(); }, 400); }); });
+    var sg = document.getElementById("signin-g"); if (sg) sg.addEventListener("click", function () { toast("正在打开 Google 登录…"); RunSync.signInGoogle().then(function () { render(); }).catch(function (e) { toast(authErr(e)); }); });
     document.getElementById("reonbBtn").addEventListener("click", function () { showOnboarding(true); });
     document.getElementById("wipeBtn").addEventListener("click", function () {
       if (confirm("确定重置全部进度？")) { localStorage.removeItem(KEY); S = load(); toast("已重置"); location.reload(); }
@@ -468,16 +482,63 @@
         '<div class="terms">继续即表示同意用户协议与隐私政策（示例）</div></div>';
       box.querySelectorAll("[data-av]").forEach(function (n) { n.addEventListener("click", function () { pick.avatar = n.dataset.av; paint(); }); });
       var inp = box.querySelector("#lname"); if (inp) inp.addEventListener("input", function () { pick.name = inp.value; });
-      box.querySelector("#lstart").addEventListener("click", function () { finish(inp ? inp.value : ""); });
-      box.querySelectorAll("[data-soc]").forEach(function (n) { n.addEventListener("click", function () { finish(pick.name || "润友"); }); });
-      box.querySelector("#lskip").addEventListener("click", function () { finish(pick.name || "润友"); });
+      function doLogin(kind) {
+        var nm = ((inp ? inp.value : pick.name) || "").trim();
+        if (nm) S.profile.name = nm;
+        S.profile.avatar = pick.avatar; saveLocal();
+        if (window.RunSync && RunSync.configured()) {
+          var card = box.querySelector(".login-card"); if (card) card.classList.add("busy");
+          (kind === "google" ? RunSync.signInGoogle() : RunSync.signInAnon()).catch(function (e) { if (card) card.classList.remove("busy"); toast(authErr(e)); });
+        } else { finish(nm); }
+      }
+      box.querySelector("#lstart").addEventListener("click", function () { doLogin("guest"); });
+      box.querySelectorAll("[data-soc]").forEach(function (n) { n.addEventListener("click", function () { if (n.dataset.soc === "google") doLogin("google"); else toast("微信 / Apple 登录即将支持，可先用 Google 或访客进入"); }); });
+      box.querySelector("#lskip").addEventListener("click", function () { doLogin("guest"); });
     }
     document.body.appendChild(box); paint();
   }
 
-  // ---------- boot ----------
+  // ---------- 账号 + 跨端同步（Firebase / RunSync）----------
+  var syncStatus = "local", authFlowDone = false;
+  function authErr(e) { var c = (e && (e.code || e.message)) || ""; if (/popup-closed|cancelled/i.test(c)) return "已取消登录"; if (/network/i.test(c)) return "网络不稳，稍后再试"; return "登录失败，可先用访客进入"; }
+  function afterAuthSettled() {
+    if (authFlowDone) return; authFlowDone = true;
+    if (!S.cfg || !S.cfg.configured) { if (!document.getElementById("onb")) showOnboarding(false); }
+    else render();
+  }
+  function onSignedIn() {
+    var lg = document.getElementById("login"); if (lg) lg.remove();
+    S.profile.authed = true; saveLocal(); refreshTop();
+    setTimeout(afterAuthSettled, 2400); // 兜底：即使云同步失败也进主流程
+  }
+  function updateSyncBadge(s) { syncStatus = s; var el = document.getElementById("syncbadge"); if (el) el.textContent = syncLabel(s); }
+  function syncLabel(s) { return s === "synced" ? "☁️ 已同步" : s === "syncing" ? "☁️ 同步中…" : s === "signed-in" ? "☁️ 已登录" : s === "connecting" ? "☁️ 连接中…" : s === "error" ? "⚠️ 同步失败" : "📴 本地"; }
+
   if (S.cfg && S.cfg.dailyGoal) RUN.dailyGoalTracks = S.cfg.dailyGoal;
   render();
-  if (!S.profile || !S.profile.authed) showLogin();
-  else if (!S.cfg || !S.cfg.configured) showOnboarding(false);
+
+  if (window.RunSync && RunSync.configured()) {
+    RunSync.setStore({
+      get: function () { return S; },
+      apply: function (m) { Object.assign(S, m); saveLocal(); if (S.cfg && S.cfg.dailyGoal) RUN.dailyGoalTracks = S.cfg.dailyGoal; },
+      rerender: function () { refreshTop(); if (!document.getElementById("onb") && !document.getElementById("login")) render(); },
+      onSynced: function () { afterAuthSettled(); }
+    });
+    RunSync.onAuth(function (u) { if (u) onSignedIn(); else { authFlowDone = false; if (!(S.profile && S.profile.authed) && !document.getElementById("login")) showLogin(); } });
+    RunSync.onStatus(updateSyncBadge);
+    RunSync.init();
+  } else {
+    if (!S.profile || !S.profile.authed) showLogin();
+    else if (!S.cfg || !S.cfg.configured) showOnboarding(false);
+  }
+
+  // 内嵌模块通过 postMessage 上报赚分 → Hub 记账并同步
+  window.addEventListener("message", function (ev) {
+    var d = ev.data; if (!d || d.type !== "run-points") return;
+    var n = Math.max(0, Math.min(50, +d.points || 0)); if (!n) return;
+    S.beans += n; S.leagueXP += Math.round(n / 2);
+    if (d.source) { S.modXP = S.modXP || {}; S.modXP[d.source] = (S.modXP[d.source] || 0) + n; }
+    if (S.lastActive !== todayStr()) { S.streak += 1; } S.lastActive = todayStr();
+    save(); refreshTop();
+  });
 })();
