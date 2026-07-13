@@ -163,7 +163,9 @@
     if (cb) cb.addEventListener("click", openChest);
     bindStudy();
     bindModules();
-    view.querySelectorAll("[data-tab]").forEach(function (n) { n.addEventListener("click", function () { go(n.dataset.tab); }); });
+    // 注意:只给非模块卡的 [data-tab](如「奖励 →」链接)绑跳转;模块卡由 bindModules 统一处理,
+    // 否则空 data-tab 会触发 go("") 把刚打开的模块又关掉(表现为"点不进去")。
+    view.querySelectorAll("[data-tab]:not(.modcard)").forEach(function (n) { if (n.dataset.tab) n.addEventListener("click", function () { go(n.dataset.tab); }); });
   }
 
   function moduleDirHTML() {
