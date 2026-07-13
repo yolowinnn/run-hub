@@ -165,14 +165,14 @@
   }
 
   function moduleDirHTML() {
-    var groups = ["出海准备", "终身提升", "社区"];
+    var groups = ["出海准备", "生活 · 终身", "趣味 · 探索", "社区"];
     var h = '<div class="sec-h"><h2>全部模块</h2><span class="faint small">润 · 一个总入口</span></div>';
     groups.forEach(function (g) {
       var mods = RUN.modules.filter(function (m) { return m.group === g; });
       if (!mods.length) return;
       h += '<div class="modgroup"><div class="ph-sec" style="font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin:14px 2px 2px">' + g + '</div><div class="modgrid">';
       mods.forEach(function (m) {
-        h += '<div class="modcard' + (m.live ? "" : " soon") + '" data-mod="' + m.key + '" data-url="' + (m.url || "") + '" data-live="' + (m.live ? 1 : 0) + '">' +
+        h += '<div class="modcard' + (m.live ? "" : " soon") + '" data-mod="' + m.key + '" data-url="' + (m.url || "") + '" data-tab="' + (m.tab || "") + '" data-live="' + (m.live ? 1 : 0) + '">' +
           '<div class="mi">' + m.icon + '</div><div class="mm"><div class="mn">' + m.name + (m.live ? "" : ' <span class="soonpill">即将</span>') + '</div><div class="md">' + m.desc + '</div></div></div>';
       });
       h += '</div></div>';
@@ -183,6 +183,7 @@
     view.querySelectorAll("[data-mod]").forEach(function (n) {
       n.addEventListener("click", function () {
         var nm = n.querySelector(".mn").textContent.replace(/即将/g, "").replace(/·.*/, "").trim();
+        if (n.dataset.tab) { go(n.dataset.tab); return; }
         if (n.dataset.live === "1" && n.dataset.url) openModule(n.dataset.url, nm);
         else toast("「" + nm + "」即将上线 🌱");
       });
@@ -191,20 +192,19 @@
 
   function renderVerbal() {
     var vr = S.readiness.verbal || 0;
-    var h = '<div class="sec-h" style="margin-top:6px"><div><div class="eyebrow">可扩充</div><h2 style="font-size:26px">Verbal · 英语</h2></div></div>';
-    h += '<p class="muted small" style="margin:-6px 2px 4px">语言是所有人的起点——第一个被做深、也最容易扩充的赛道。按「能力」分层，未来加一门考试只是加一个 tab。</p>';
+    var h = '<div class="sec-h" style="margin-top:6px"><div><div class="eyebrow">统一入口</div><h2 style="font-size:26px">语言</h2></div></div>';
+    h += '<p class="muted small" style="margin:-6px 2px 4px">出海的第一道关。英语、法语、德语都收在这一个门里——选语种进各自的完整练习，进度与积分共用同一套骨架。</p>';
     h += '<div class="card readi fade" style="margin-top:14px"><div class="ring">' + ringSVG(vr, "var(--green)") +
-      '<div class="ctr"><div class="n">' + vr + '</div><div class="l">英语度</div></div></div>' +
-      '<div class="rt"><div class="h">离雅思 7.5 还有多远</div><p>每天的词量与练习都会喂给这个数字。</p></div></div>';
-    h += '<div class="sec-h"><h2>模块</h2></div><div class="mods">';
+      '<div class="ctr"><div class="n">' + vr + '</div><div class="l">语言度</div></div></div>' +
+      '<div class="rt"><div class="h">过语言关的进度</div><p>每天的词量与练习都会喂给这个数字。</p></div></div>';
+    h += '<div class="sec-h"><h2>选语种</h2></div><div class="mods">';
     RUN.verbalModules.forEach(function (m) {
       h += '<div class="mod fade"' + (m.url ? ' data-study="verbal" data-url="' + m.url + '" style="cursor:pointer"' : '') + '>' +
         '<div class="mi">' + m.icon + '</div><div class="mm"><div class="n">' + m.name + '</div><div class="d">' + m.desc + '</div></div>' +
         '<span class="tag">' + m.tag + '</span></div>';
     });
     h += '</div>';
-    h += '<div class="note fade"><b>扩充路径：</b>Verbal 之下再开 GRE / 托福 / 日语 / 西语——每个都是一个 tab、一套题、共享同一个打卡与积分骨架。</div>';
-    h += '<a class="btn fade" style="margin-top:16px" href="https://ielts75.vercel.app/" target="_blank" rel="noopener">打开 Verbal 完整练习 →</a>';
+    h += '<div class="note fade"><b>扩充路径：</b>再开 GRE / 托福 / 日语 / 西语——每个都是一个语种卡，一套题，共享同一个打卡与积分骨架。</div>';
     view.innerHTML = h;
     bindStudy();
   }

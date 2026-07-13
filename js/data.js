@@ -45,13 +45,12 @@ window.RUN = {
     },
   ],
 
-  // Verbal 子模块
+  // 统一「语言」入口 —— 一个门里选语种，各自进对应的完整练习
   verbalModules: [
-    { icon: "🔁", name: "词汇 · SRS", desc: "间隔重复背单词，闪卡 + 例句。", tag: "342 词", url: "https://ielts75.vercel.app/" },
-    { icon: "🎧", name: "听 · 读 · 写", desc: "雅思四项模块化练习。", tag: "8 周计划", url: "https://ielts75.vercel.app/" },
-    { icon: "🗣️", name: "口语 · AI 反馈", desc: "GPT 即时批改打分（杀手锏）。", tag: "GPT", url: "https://ielts75.vercel.app/" },
-    { icon: "🇫🇷", name: "法语 / 德语", desc: "4 档分级 (A1–C1)：词汇·短句·语法。", tag: "已上线", url: "https://run-lang.vercel.app/" },
-    { icon: "➕", name: "更多语言", desc: "日语 / 西语 / GRE / 托福——加档即可。", tag: "Roadmap", url: null },
+    { icon: "🇬🇧", name: "英语 · 雅思 / 托福", desc: "词汇 SRS · 听说读写 · 口语 AI 批改。", tag: "完整", url: "https://ielts75.vercel.app/" },
+    { icon: "🇫🇷", name: "法语 · A1–C1", desc: "词汇闪卡 · 情景对话 · 听力 · 练习。", tag: "已上线", url: "https://run-lang.vercel.app/#fr" },
+    { icon: "🇩🇪", name: "德语 · A1–C1", desc: "词汇闪卡 · 情景对话 · 听力 · 练习。", tag: "已上线", url: "https://run-lang.vercel.app/#de" },
+    { icon: "➕", name: "日语 / 西语 / GRE", desc: "共享同一套打卡与积分骨架，加档即可。", tag: "Roadmap", url: null },
   ],
 
   // 奖励商店（润豆兑换）
@@ -106,18 +105,18 @@ window.RUN = {
     { q: "“The argument was ___; it convinced no one.”", opts: ["cogent", "specious", "lucid", "salient"], a: 1, lv: 3 },
   ],
 
-  // ---- 全平台模块目录（总入口） ----
+  // ---- 全平台模块目录（总入口）。分组：出海准备 / 生活·终身 / 趣味 / 社区 ----
   modules: [
-    { key: "language", icon: "🗣️", name: "语言 Verbal", desc: "多语言·分级", url: "https://ielts75.vercel.app/", live: true, group: "出海准备" },
+    { key: "language", icon: "🗣️", name: "语言", desc: "英语·法语·德语·分级练习", tab: "verbal", live: true, group: "出海准备" },
     { key: "culture", icon: "🏛️", name: "文化 Culture", desc: "多国文化融入", url: "https://homeroom-orcin.vercel.app/", live: true, group: "出海准备" },
     { key: "quant", icon: "📈", name: "Quant / 技术", desc: "面试硬技能", url: "https://quant-ai-prep.vercel.app/", live: true, group: "出海准备" },
     { key: "apply", icon: "🎓", name: "留学申请", desc: "选校·文书·时间线", url: "https://run-modules.vercel.app/#apply", live: true, group: "出海准备" },
-    { key: "visa", icon: "🛂", name: "签证", desc: "签证阶梯·各国对比·拒签破解", url: "https://run-modules.vercel.app/#visa", live: true, group: "出海准备" },
+    { key: "visa", icon: "🛂", name: "签证", desc: "资格自测·材料清单·倒计时·各国对比", url: "https://run-modules.vercel.app/#visa", live: true, group: "出海准备" },
     { key: "career", icon: "💼", name: "海外找工", desc: "简历·内推·身份", url: "https://run-modules.vercel.app/#career", live: true, group: "出海准备" },
-    { key: "mystic", icon: "🔮", name: "玄学定位", desc: "八字/星座/MBTI 荐国家", url: "https://run-modules.vercel.app/#mystic", live: true, group: "出海准备" },
-    { key: "fitness", icon: "💪", name: "健身", desc: "训练·饮食·睡眠·清单", url: "https://run-modules.vercel.app/#fitness", live: true, group: "终身提升" },
-    { key: "dance", icon: "💃", name: "跳舞 / 艺术", desc: "含乐器扒谱", url: "https://chordscribe-app-coral.vercel.app/", live: true, group: "终身提升" },
-    { key: "style", icon: "✨", name: "形象 Style", desc: "护肤·美白·穿搭", url: "https://run-modules.vercel.app/#style", live: true, group: "终身提升" },
+    { key: "fitness", icon: "💪", name: "健身", desc: "训练·饮食·睡眠·清单", url: "https://run-modules.vercel.app/#fitness", live: true, group: "生活 · 终身" },
+    { key: "style", icon: "✨", name: "形象 Style", desc: "护肤·美白·穿搭", url: "https://run-modules.vercel.app/#style", live: true, group: "生活 · 终身" },
+    { key: "music", icon: "🎸", name: "音乐 · 扒谱", desc: "识曲·和弦·吉他扒谱", url: "https://chordscribe-app-coral.vercel.app/", live: true, group: "生活 · 终身" },
+    { key: "mystic", icon: "🔮", name: "玄学定位", desc: "八字/星座/MBTI · 趣味定位", url: "https://run-modules.vercel.app/#mystic", live: true, group: "趣味 · 探索" },
     { key: "buddy", icon: "🤝", name: "润人搭子", desc: "按目标匹配搭子·聚合Agent", url: "https://run-api-mu.vercel.app/", live: true, group: "社区" },
   ],
 };
